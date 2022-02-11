@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "sourceMap": true,
+        "target": "ES2017",
+        "lib": [
+            "ES2017",
+            "DOM"
+        ],
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

@@ -1,0 +1,98 @@
+service: books
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    TABLENAME: ${self:custom.tableName}
+    BUCKETNAME: ${self:custom.bucketName}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamedb:DeleteItem
+      Resource: 'arn:aws:dynamodb:us-east-1:400728192204:table/persons-table'
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: '*'
+custom:
+  bucketName: savepersons
+  tableName: persons-table
+functions:
+  hello:
+    handler: ./src/Handlers/handler.handler
+    events:
+      - http:
+          method: get
+          path: hello
+  bad:
+    handler: ./src/Handlers/badHandler.handler
+    events:
+      - http:
+          method: post
+          path: pinches/{apellido}
+  greetings:
+    handler: ./src/Handlers/hello.hello
+    events:
+      - http:
+          method: get
+          path: greetings/{id}
+  user:
+    handler: ./src/Handlers/user.handler
+    events:
+      - http:
+          method: get
+          path: handler/{id}
+  person:
+    handler: ./src/Handlers/PersonHandler.handler
+    events:
+      - http:
+          method: get
+          path: person/{id}
+  createPerson:
+    handler: ./src/Handlers/CrearPersonaHandler.handler
+    events:
+      - http:
+          method: post
+          path: create/person
+  searchPerson:
+    handler: ./src/Handlers/BuscarPersonaHandler.handler
+    events:
+      - http:
+          method: get
+          path: get/person/{id}
+  searchUserS3:
+    handler: ./src/Handlers/GuardarPersonaS3.handler
+    events:
+      - http:
+          method: get
+          path: save/s3/{id}
+resources:
+  Resources:
+    Personas:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableName}
+        AttributeDefinitions:
+          - AttributeName: PersonId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PersonId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    bucketUpload:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketName}
+        
