@@ -2,6 +2,7 @@ service: books
 
 plugins:
   - serverless-webpack
+  - serverless-prune-plugin
 
 provider:
   name: aws
